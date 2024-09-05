@@ -10,7 +10,7 @@ For this lab you'll define your structs/classes in `drawing.h`, you'll implement
 To compile our program we'll use:
 
 ```
-clang++ -Wall drawing.cpp draw.cpp -o draw
+clang++ -Wall bmplib.cpp drawing.cpp draw.cpp -o draw
 ```
 
 #### Objects
