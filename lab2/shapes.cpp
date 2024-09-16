@@ -8,24 +8,17 @@ using namespace std;
 
 Shape::Shape(Color c) : m_color(c) {};
 
-void Shape::draw(uint8_t ***image, uint32_t h, uint32_t w)
-{
+void Shape::draw(uint8_t ***image, uint32_t h, uint32_t w) {
 
   BoundingBox b = getBoundingBox();
 
-  // cout << "Bounding Box: x: " << b.ul.x << ", y: " << b.ul.y << endl;
-  // cout << "Bounding Box: x: " << b.br.x << ", y: " << b.br.y << endl;
-
-  for (int i = b.ul.y; i < b.br.y; ++i) {
-    for (int j = b.ul.x; j < b.br.x; ++j) {
-
+  for (int i = b.ul.x; i < b.br.x; ++i) {
+    for (int j = b.ul.y; j < b.br.y; ++j) {
       if (i < h && j < w) {
-        if (inside(j, i)) {
-
-          uint8_t s[3];
-          m_color.deserialize(s);
-
-          image[j][i] = s;
+        if (inside(i, j)) {
+          image[j][i][0] = m_color.r;
+          image[j][i][1] = m_color.g;
+          image[j][i][2] = m_color.b;
         }
       }
     }
@@ -35,7 +28,6 @@ void Shape::draw(uint8_t ***image, uint32_t h, uint32_t w)
 Triangle::Triangle(Color c, Point points[3]) : Shape(c) {
   for (int i = 0; i < 3; ++i) {
     m_points[i] = points[i];
-    // cout << "Initializing point " << i << ": " << m_points[i].x << ", " << m_points[i].y << endl;
   }
 }
 
@@ -53,8 +45,6 @@ BoundingBox Triangle::getBoundingBox() {
 
     curr_point.x = m_points[i].x;
     curr_point.y = m_points[i].y;
-
-    cout << "Point " << i << ": " << curr_point.x << ", " << curr_point.y << endl;
 
     if (curr_point.x > max_x) {
       max_x = curr_point.x;
@@ -105,32 +95,48 @@ bool Triangle::inside(uint32_t x, uint32_t y) {
   return is_inside;
 }
 
-// Circle::Circle(Color c, Point center, int radius) : Shape(c) {
-//   m_center = center;
-//   m_radius = radius;
-// }
+Circle::Circle(Color c, Point center, int radius) : Shape(c) {
+  m_center = center;
+  m_radius = radius;
+}
 
-// BoundingBox Circle::getBoundingBox() {
-//   BoundingBox b;
+BoundingBox Circle::getBoundingBox() {
+  Point br;
+  br.x = m_center.x + m_radius;
+  br.y = m_center.y + m_radius;
 
-//   b.br = ;
-//   b.ul = ;
-// }
+  Point ul;
+  ul.x = m_center.x - m_radius;
+  ul.y = m_center.y - m_radius;
 
-// bool Circle::inside(uint32_t x, uint32_t y) {
-// }
+  BoundingBox b = BoundingBox(ul, br);
 
-// Rectangle::Rectangle(Color c, Point ul, Point br) : Shape(c) {
-//   m_ul = ul;
-//   m_br = br;
-// }
+  return b;
+}
 
-// BoundingBox Rectangle::getBoundingBox() {
-//   BoundingBox b;
+bool Circle::inside(uint32_t x, uint32_t y) {
+  uint32_t dx = x - m_center.x;
+  uint32_t dy = y - m_center.y;
+  uint32_t d_squared = dx * dx + dy * dy;
 
-//   b.br = ;
-//   b.ul = ;
-// }
+  return d_squared <= (m_radius * m_radius);
+}
 
-// bool Rectangle::inside(uint32_t x, uint32_t y) {
-// }
+Rectangle::Rectangle(Color c, Point ul, Point br) : Shape(c) {
+  m_ul = ul;
+  m_br = br;
+}
+
+BoundingBox Rectangle::getBoundingBox() {
+  BoundingBox b = BoundingBox(m_ul, m_br);
+  return b;
+}
+
+bool Rectangle::inside(uint32_t x, uint32_t y) {
+  if (x > m_ul.x && x < m_br.x) {
+    if (y > m_ul.y && y < m_br.y) {
+      return true;
+    }
+  }
+  return false;
+}

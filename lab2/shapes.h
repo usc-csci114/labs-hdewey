@@ -1,19 +1,12 @@
 #ifndef __SHAPES_H__
 #define __SHAPES_H__
 #include <vector>
-#include <cstring>
 
 //define our (virtual) base class
 using namespace std;
 
 struct Color {
 	uint8_t r, g, b;
-
-	void deserialize(uint8_t* s) {
-		s[0] = r;
-		s[1] = g;
-		s[2] = b;
-	}
 };
 
 struct Point {
@@ -39,11 +32,11 @@ private:
 //define a derived class for Triangle, Rectagle, and Circle
 class Triangle : public Shape {
 public:
-    Triangle(Color c, Point points[3]);
-    bool inside(uint32_t x, uint32_t y);
-    BoundingBox getBoundingBox();
+	Triangle(Color c, Point points[3]);
+	bool inside(uint32_t x, uint32_t y);
+	BoundingBox getBoundingBox();
 private:
-    Point m_points[3];
+	Point m_points[3];
 };
 
 class Circle : public Shape {
